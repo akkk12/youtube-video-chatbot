@@ -18,6 +18,8 @@ A free-stack chatbot that answers questions from a YouTube video's transcript. I
 
 ## Architecture
 
+The app follows a retrieval-augmented generation flow. The LLM does not answer from its own memory first; it receives only the most relevant transcript chunks and is instructed to answer from that context.
+
 ```text
 YouTube URL
     |
@@ -42,6 +44,66 @@ LLM Service: Ollama or Gemini
     v
 Answer + timestamps + source chunks
 ```
+
+```mermaid
+flowchart TD
+    user["User"] --> ui["Streamlit UI"]
+    ui --> transcript["Transcript Service"]
+    transcript --> chunks["Chunking Service"]
+    chunks --> embed["Embedding Service"]
+    embed --> chroma["ChromaDB"]
+
+    user --> question["Question"]
+    question --> retrieve["Retrieval Service"]
+    retrieve --> chroma
+    retrieve --> context["Top transcript chunks"]
+    context --> llm["LLM Service"]
+    llm --> ollama["Ollama local model"]
+    llm --> gemini["Optional Gemini model"]
+    llm --> answer["Answer with timestamps, sources, confidence"]
+    answer --> ui
+```
+
+## How It Works
+
+### Video Processing Flow
+
+1. The user pastes a YouTube URL in the Streamlit sidebar.
+2. `transcript_service.py` extracts the video ID and fetches transcript rows with `text`, `start`, and `duration`.
+3. `chunking_service.py` combines transcript rows into overlapping chunks.
+4. `embedding_service.py` embeds each chunk with `all-MiniLM-L6-v2`.
+5. `vector_store_service.py` stores chunk text, timestamps, and embeddings in ChromaDB.
+
+### Question Answering Flow
+
+1. The user asks a question in the chat interface.
+2. `retrieval_service.py` embeds the question and retrieves the top matching transcript chunks from ChromaDB.
+3. `gemini_service.py` sends the retrieved chunks to the configured LLM provider.
+4. The LLM receives a strict prompt: answer only from transcript context.
+5. The UI displays the answer, confidence score, timestamp range, and source chunks.
+
+## Module Responsibilities
+
+| Module | Responsibility |
+| --- | --- |
+| `ui/streamlit_app.py` | Streamlit interface, chat state, video processing button, study actions |
+| `services/transcript_service.py` | YouTube video ID extraction and transcript fetching |
+| `services/chunking_service.py` | Timestamp-preserving transcript chunking |
+| `services/embedding_service.py` | Sentence-transformer embedding generation |
+| `services/vector_store_service.py` | ChromaDB collection creation, storage, and querying |
+| `services/retrieval_service.py` | Top-k transcript retrieval with similarity scores |
+| `services/gemini_service.py` | LLM provider wrapper for Ollama or Gemini |
+| `prompts/qa_system.txt` | Transcript-only answer policy |
+| `prompts/study_prompts.py` | Prompt templates for summary, notes, flashcards, and MCQs |
+
+## Key Design Choices
+
+- **Transcript-first answers:** The chatbot is designed for grounded video Q&A, so answers are based on retrieved transcript chunks.
+- **Timestamps preserved:** Each chunk stores `start_time` and `end_time`, making answers traceable back to the video.
+- **Local LLM by default:** Ollama avoids hosted API quota issues and keeps the project free for demos.
+- **Small embedding model:** `all-MiniLM-L6-v2` is fast, free, and works well for semantic transcript search.
+- **Persistent vector store:** ChromaDB keeps processed video embeddings locally in `chroma_db`.
+- **Minimal backend:** FastAPI is included with a health endpoint, while Streamlit handles the main app experience.
 
 ## Project Structure
 
