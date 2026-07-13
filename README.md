@@ -83,6 +83,8 @@ cp .env.example .env
 
 ## Option 1: Run With Free Local Ollama
 
+Ollama is the default LLM provider for this project because it keeps the demo fully free and local. It avoids hosted API quotas, billing setup, rate limits, and model availability issues while still letting the app generate transcript-grounded answers. This is useful for demos, classrooms, and personal study workflows where reliability matters more than using the largest hosted model.
+
 Install Ollama:
 
 ```bash
@@ -114,6 +116,43 @@ Start Ollama:
 ```bash
 ollama serve
 ```
+
+## Experiment With Ollama Models
+
+You can try different local models without changing the app code. Pull a model, update `OLLAMA_MODEL` in `.env`, then restart Streamlit.
+
+List installed models:
+
+```bash
+ollama list
+```
+
+Pull a new model:
+
+```bash
+ollama pull llama3.2:3b
+```
+
+Update `.env`:
+
+```bash
+OLLAMA_MODEL=llama3.2:3b
+```
+
+Restart Streamlit:
+
+```bash
+streamlit run ui/streamlit_app.py
+```
+
+Suggested free models:
+
+- `qwen2.5:0.5b`: fastest and lightest, good for quick demos on low-memory machines
+- `llama3.2:3b`: better answer quality while still running comfortably on many laptops
+- `qwen2.5:3b`: strong general-purpose option for transcript Q&A
+- `qwen2.5:7b`: higher quality, but needs more RAM and may respond more slowly
+
+If a model feels slow, switch to a smaller one. If answers feel too shallow, try a larger one.
 
 ## Option 2: Run With Gemini
 
