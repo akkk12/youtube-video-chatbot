@@ -64,6 +64,99 @@ flowchart TD
     answer --> ui
 ```
 
+### Video Processing Sequence
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Streamlit UI
+    participant Transcript as Transcript Service
+    participant Chunker as Chunking Service
+    participant Embedder as Embedding Service
+    participant Chroma as ChromaDB
+
+    User->>UI: Paste YouTube URL
+    User->>UI: Click Process
+    UI->>Transcript: Extract video ID and fetch transcript
+    Transcript-->>UI: Timestamped transcript rows
+    UI->>Chunker: Create overlapping transcript chunks
+    Chunker-->>UI: Chunks with start and end times
+    UI->>Embedder: Embed chunk text
+    Embedder-->>UI: Embedding vectors
+    UI->>Chroma: Upsert chunks, metadata, embeddings
+    Chroma-->>UI: Video ready for questions
+```
+
+### Question Answering Sequence
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Streamlit UI
+    participant Retriever as Retrieval Service
+    participant Chroma as ChromaDB
+    participant LLM as LLM Service
+    participant Ollama as Ollama or Gemini
+
+    User->>UI: Ask a question
+    UI->>Retriever: Retrieve relevant chunks
+    Retriever->>Chroma: Search by query embedding
+    Chroma-->>Retriever: Top-k chunks with distances
+    Retriever-->>UI: Retrieved chunks with similarity scores
+    UI->>LLM: Send question and transcript context
+    LLM->>Ollama: Generate grounded answer
+    Ollama-->>LLM: Answer text
+    LLM-->>UI: Answer, sources, confidence
+    UI-->>User: Show answer with timestamps and source chunks
+```
+
+### Runtime Components
+
+```mermaid
+flowchart LR
+    browser["Browser"] --> streamlit["Streamlit app :8501"]
+    streamlit --> python["Python services"]
+    python --> chroma["Local ChromaDB files"]
+    python --> stmodel["SentenceTransformer model"]
+    python --> ollama["Ollama server :11434"]
+    python -. optional .-> gemini["Gemini API"]
+
+    subgraph Local Machine
+        streamlit
+        python
+        chroma
+        stmodel
+        ollama
+    end
+```
+
+### Data Model
+
+```mermaid
+classDiagram
+    class TranscriptItem {
+        string text
+        float start
+        float duration
+    }
+
+    class TranscriptChunk {
+        string text
+        float start_time
+        float end_time
+    }
+
+    class RetrievedChunk {
+        string text
+        float start_time
+        float end_time
+        float similarity_score
+    }
+
+    TranscriptItem --> TranscriptChunk : grouped into
+    TranscriptChunk --> RetrievedChunk : retrieved as
+```
+
 ## How It Works
 
 ### Video Processing Flow
