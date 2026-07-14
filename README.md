@@ -391,12 +391,114 @@ RETRIEVAL_TOP_K=5
 
 ## Usage
 
-1. Start Ollama if using local LLM mode.
-2. Start Streamlit.
+### End-To-End Demo Flow
+
+1. Start Ollama if using local LLM mode:
+
+   ```bash
+   ollama serve
+   ```
+
+2. Start the Streamlit app:
+
+   ```bash
+   streamlit run ui/streamlit_app.py
+   ```
+
 3. Paste a YouTube URL in the sidebar.
 4. Click `Process`.
-5. Ask questions in the chat box.
-6. Review timestamp citations and source chunks.
+5. Wait for the transcript to be fetched, chunked, embedded, and stored.
+6. Ask a question in the chat box.
+7. Review the generated answer, timestamp citation, confidence score, and source chunks.
+
+### Example Demo Topics
+
+Choose videos that have clear captions/transcripts. Short educational videos work best for a quick demo.
+
+- Python decorators
+- FastAPI basics
+- Machine learning introduction
+- How HTTP works
+- Git and GitHub basics
+- Photosynthesis explained
+
+### Example Questions
+
+After processing a video, try questions like:
+
+```text
+What is the main idea of this video?
+```
+
+```text
+Summarize the key points in bullet form.
+```
+
+```text
+What example does the speaker use to explain the concept?
+```
+
+```text
+Create five flashcards from this video.
+```
+
+```text
+Generate multiple-choice questions with answers.
+```
+
+### What The Output Shows
+
+Each answer is designed to be auditable:
+
+- **Answer:** generated from retrieved transcript context
+- **Mentioned at:** timestamp range for the most relevant chunk
+- **Sources Used:** transcript chunks used by the answer
+- **Confidence:** average similarity score from retrieved chunks
+- **Suggested questions:** quick prompts for common study workflows
+
+### Demo Tips
+
+- Use a video under 15 minutes for faster processing.
+- Prefer videos with manually created captions when available.
+- Use `llama3.2:3b` or `qwen2.5:3b` for better local answer quality.
+- Use `qwen2.5:0.5b` when you need the fastest lightweight demo.
+- If a video fails to process, try another video with captions enabled.
+
+## Troubleshooting
+
+### Ollama Connection Refused
+
+If you see a connection error for `localhost:11434`, Ollama is not running.
+
+```bash
+ollama serve
+```
+
+### Model Not Found
+
+If Ollama says the model is missing, pull it first:
+
+```bash
+ollama pull qwen2.5:0.5b
+```
+
+Then confirm it is installed:
+
+```bash
+ollama list
+```
+
+### YouTube Transcript Not Available
+
+Some videos do not expose captions through `youtube-transcript-api`. Try a different video with captions enabled.
+
+### Gemini Quota Errors
+
+Gemini free-tier quota may be unavailable for some projects or models. Switch back to local mode:
+
+```bash
+LLM_PROVIDER=ollama
+```
 
 ## Notes
 
