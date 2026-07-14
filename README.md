@@ -10,6 +10,24 @@ The app starts with a simple workflow: paste a YouTube URL, process the transcri
 
 ![YouTube Video Chatbot home screen](docs/screenshots/home.png)
 
+### Demo Video
+
+This README uses the following video URL as the sample demo input:
+
+```text
+https://www.youtube.com/watch?v=fDKIpRe8GW4
+```
+
+![Demo video URL entered in the app](docs/screenshots/demo-url.png)
+
+Recommended demo questions:
+
+- What is the main idea of this video?
+- Summarize the key points from the transcript.
+- What examples or explanations does the speaker use?
+- Create concise study notes from this video.
+- Generate five flashcards from the transcript.
+
 ### Screenshots
 
 | Sidebar workflow | Chat workspace |
@@ -405,7 +423,12 @@ RETRIEVAL_TOP_K=5
    streamlit run ui/streamlit_app.py
    ```
 
-3. Paste a YouTube URL in the sidebar.
+3. Paste the demo YouTube URL in the sidebar:
+
+   ```text
+   https://www.youtube.com/watch?v=fDKIpRe8GW4
+   ```
+
 4. Click `Process`.
 5. Wait for the transcript to be fetched, chunked, embedded, and stored.
 6. Ask a question in the chat box.
