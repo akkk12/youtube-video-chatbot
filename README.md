@@ -1,6 +1,20 @@
 # YouTube Video Chatbot
 
-A free-stack chatbot that answers questions from a YouTube video's transcript. It fetches transcript text, chunks it with timestamps, stores embeddings in ChromaDB, retrieves the most relevant transcript passages, and answers using either a local Ollama model or Gemini.
+A full-stack, free-to-run YouTube transcript chatbot built with Streamlit, FastAPI-ready services, ChromaDB, sentence-transformers, and a local Ollama LLM. The app converts a YouTube transcript into searchable chunks, retrieves the most relevant source passages for each question, and answers with timestamp citations so users can trace every response back to the video.
+
+The project is designed as a practical RAG application: modular service boundaries, local-first defaults, persistent vector storage, clear configuration, and a README that documents how the system works end to end.
+
+## Demo
+
+The app starts with a simple workflow: paste a YouTube URL, process the transcript, then ask questions or generate study material.
+
+![YouTube Video Chatbot home screen](docs/screenshots/home.png)
+
+### Screenshots
+
+| Sidebar workflow | Chat workspace |
+| --- | --- |
+| ![Sidebar workflow](docs/screenshots/sidebar.png) | ![Chat workspace](docs/screenshots/main-panel.png) |
 
 ## Features
 
@@ -15,6 +29,19 @@ A free-stack chatbot that answers questions from a YouTube video's transcript. I
 - Study helpers: summary, notes, flashcards, and MCQs
 - Local free LLM support through Ollama
 - Optional Gemini support
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| UI | Streamlit |
+| API foundation | FastAPI |
+| Transcript source | `youtube-transcript-api` |
+| Embeddings | `sentence-transformers` with `all-MiniLM-L6-v2` |
+| Vector database | ChromaDB |
+| Default LLM | Ollama with a local model |
+| Optional hosted LLM | Gemini Flash |
+| Configuration | `pydantic-settings` and `.env` |
 
 ## Architecture
 
